@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\AuthenticationController;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 //Route::get('/get', [PageController::class, 'index']); //route for all records/pages
 Route::get('/get/{id}', [PageController::class, 'index']);  // route for single page
 Route::post('/page', [PageController::class, 'store']);
