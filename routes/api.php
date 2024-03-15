@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\ForgotPasswordController;
@@ -34,6 +35,11 @@ Route::post('/create/page', [PageController::class, 'store'])->middleware('auth:
 Route::delete('/delete/page/{id}', [PageController::class, 'destroy'])->middleware('auth:api');
 Route::post('/get/page/all', [PageController::class, 'all_pages'])->middleware('auth:api');
 Route::post('/update/page', [PageController::class, 'update'])->middleware('auth:api');
+
+// Contact us email and entries to database
+Route::post('contact-us', [ContactController::class, 'contactusPost']);
+Route::post('/get/contact/entries', [ContactController::class, 'get_messages'])->middleware('auth:api');
+Route::delete('/delete/contact/entry/{id}', [ContactController::class, 'destroy'])->middleware('auth:api');
 
 Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('login', [AuthenticationController::class, 'store']);
