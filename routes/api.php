@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\CodeCheckController;
+use App\Http\Controllers\Api\ResetPasswordController;
 
 
 
@@ -26,9 +29,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('user/update/{id}', [UserController::class, 'update'])->middleware('auth:api');
 
 //Route::get('/get', [PageController::class, 'index']); //route for all records/pages
-Route::get('/get/{id}', [PageController::class, 'index']);  // route for single page
-Route::post('/page', [PageController::class, 'store']);
-Route::delete('/delete/{id}', [PageController::class, 'destroy']);
+Route::get('/get/page/{id}', [PageController::class, 'index']);  // route for single page
+Route::post('/create/page', [PageController::class, 'store'])->middleware('auth:api');
+Route::delete('/delete/page/{id}', [PageController::class, 'destroy'])->middleware('auth:api');
+Route::post('/get/page/all', [PageController::class, 'all_pages'])->middleware('auth:api');
+Route::post('/update/page', [PageController::class, 'update'])->middleware('auth:api');
 
 Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('login', [AuthenticationController::class, 'store']);
@@ -37,6 +42,11 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('user/update/{id}', [AuthenticationController::class, 'update_user'])->middleware('auth:api');
     Route::post('user/delete/{id}', [AuthenticationController::class, 'delete_user'])->middleware('auth:api');
     Route::post('logout', [AuthenticationController::class, 'destroy'])->middleware('auth:api');
+
+    Route::post('password/email',  [ForgotPasswordController::class, '__invoke']);
+    Route::post('password/code/check', [CodeCheckController::class, '__invoke']);
+    Route::post('password/reset', [ResetPasswordController::class, '__invoke'])->middleware('auth:api');
 });
+
 
 

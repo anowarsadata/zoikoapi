@@ -8,7 +8,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
-use DB;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 
 
@@ -168,7 +170,13 @@ class AuthenticationController extends Controller
     }
 
 
-
+    /**
+     * API Updatex
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @description update user by admin
+     */
 
     public function update_user(Request $request, string $id)
     {
@@ -210,6 +218,14 @@ class AuthenticationController extends Controller
         }
     }
 
+    /**
+     * API Deletex
+     *
+     * @param Request $request
+     * @param string id
+     * @return \Illuminate\Http\JsonResponse
+     * @description delete user by admin
+     */
     public function delete_user(Request $request, string $id){
         $check_authentication = Auth::user();
         if($check_authentication && $check_authentication->hasRole('admin')){
@@ -228,4 +244,7 @@ class AuthenticationController extends Controller
         }
 
     }
+
+
 }
+

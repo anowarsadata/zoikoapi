@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('title')->unique();
             $table->text('content')->nullable();
             $table->text('og_title')->nullable();
             $table->text('og_type')->nullable();
