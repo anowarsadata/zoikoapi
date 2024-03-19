@@ -245,6 +245,21 @@ class AuthenticationController extends Controller
 
     }
 
+    public function show(string $id)
+    {
+        $check_authentication = Auth::user();
+        if ($check_authentication && $check_authentication->hasRole('admin')) {
+            $user = User::find($id);
+            return response()->json([
+                'user' => $user,
+            ]);
+        } else {
+            return response()->json([
+                'message' => $check_authentication,
+            ], 200);
+        }
+    }
+
 
 }
 

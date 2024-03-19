@@ -22,6 +22,19 @@ class ProductController extends Controller
         ], 200);
     }
 
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $product = Product::find($id);
+        return response()->json([
+            'product' => $product,
+        ]);
+    }
+
+
     /**
      * Store a newly created resource in storage.
      *

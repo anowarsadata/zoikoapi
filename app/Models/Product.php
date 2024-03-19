@@ -14,11 +14,17 @@ class Product extends Model
         'description',
         'price_uk',
         'price_usa',
-        'category_id',
+        'product_category_id',
         'product_type_id',
-        'discount_type_id',
+        'product_discount_type_id',
         'short_description',
         'discount',
         'featured',
     ];
+    public function productCategory() {
+        return $this->belongsTo(ProductCategory::class);
+    }
+    public function discountType() {
+        return $this->belongsTo(DiscountType::class);
+    }
 }

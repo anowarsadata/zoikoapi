@@ -9,8 +9,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\CodeCheckController;
 use App\Http\Controllers\Api\ResetPasswordController;
-use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\DiscountTypeController;
 
 
 
@@ -47,6 +48,7 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('login', [AuthenticationController::class, 'store']);
     Route::post('register', [AuthenticationController::class, 'register']);
     Route::get('users', [AuthenticationController::class, 'get_all_users'])->middleware('auth:api');
+    Route::get('user/{id}', [AuthenticationController::class, 'show'])->middleware('auth:api');
     Route::post('user/update/{id}', [AuthenticationController::class, 'update_user'])->middleware('auth:api');
     Route::delete('user/delete/{id}', [AuthenticationController::class, 'delete_user'])->middleware('auth:api');
     Route::post('logout', [AuthenticationController::class, 'destroy'])->middleware('auth:api');
@@ -55,14 +57,23 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('password/code/check', [CodeCheckController::class, '__invoke']);
     Route::post('password/reset', [ResetPasswordController::class, '__invoke'])->middleware('auth:api');
 
-    //Category routes
-    //Route::get('product-categories',  [CategoryController::class, 'index']);
-
     //Product Routes
     Route::get('products',  [ProductController::class, 'index']);
+    Route::get('product/get/{id}',  [ProductController::class, 'show']);
     Route::post('product/create',  [ProductController::class, 'store'])->middleware('auth:api');
     Route::post('product/update/{id}',  [ProductController::class, 'update'])->middleware('auth:api');
     Route::delete('product/delete/{id}',  [ProductController::class, 'destroy'])->middleware('auth:api');
+
+    //Product Category routes
+    Route::get('product/categories/',  [ProductCategoryController::class, 'index']);
+    Route::get('product/category/{id}',  [ProductCategoryController::class, 'show']);
+    Route::post('product/category/create',  [ProductCategoryController::class, 'store'])->middleware('auth:api');
+    Route::post('product/category/update/{id}',  [ProductCategoryController::class, 'update'])->middleware('auth:api');
+    Route::delete('product/category/delete/{id}',  [ProductCategoryController::class, 'destroy'])->middleware('auth:api');
+
+    // Product Discount type
+    Route::get('discount/types',  [DiscountTypeController::class, 'index']);
+    Route::post('discount/type/create',  [DiscountTypeController::class, 'store'])->middleware('auth:api');
 });
 
 
