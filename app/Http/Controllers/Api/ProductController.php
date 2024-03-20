@@ -45,13 +45,15 @@ class ProductController extends Controller
     {
         $check_authentication = Auth::user();
         if ($check_authentication && $check_authentication->hasRole('admin')) {
-            $result = Product::create($request->validated());
+            if($request->validated()){
+            $result = Product::create($request->all());
 
             return response()->json([
                 'success' => true,
                 'message' => "Product created successfully.",
                 'products' => $result,
             ], 200);
+        }
         } else {
             return response()->json([
                 'message' => $check_authentication,
@@ -77,6 +79,7 @@ class ProductController extends Controller
                 'price_usa' => 'required|numeric|min:0',
             ]);
             $product = Product::find($id);
+
             if ($product) {
                 if ($product->update($request->all())) {
                     return response()->json([

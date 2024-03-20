@@ -27,4 +27,8 @@ class Product extends Model
     public function discountType() {
         return $this->belongsTo(DiscountType::class);
     }
+    public function productAttributes()
+    {
+        return $this->hasMany(ProductAttribute::class);
+    }
 }

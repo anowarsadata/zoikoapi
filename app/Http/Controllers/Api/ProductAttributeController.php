@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\StoreProductAttributeRequest;
 use App\Http\Controllers\Controller;
-use App\Models\DiscountType;
+use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
-class DiscountTypeController extends Controller
+class ProductAttributeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $discount_types = DiscountType::all();
+        $attributes = ProductAttribute::all();
 
         return response()->json([
-            'discount_types' => $discount_types,
+            'attributes' => $attributes,
         ], 200);
     }
 
@@ -33,25 +34,28 @@ class DiscountTypeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductAttributeRequest $request)
     {
         $check_authentication = Auth::user();
         if ($check_authentication && $check_authentication->hasRole('admin')) {
-            $validatedData = $this->validate($request, [
-                'name' => 'required|min:3|max:255|string'
-            ]);
+            /*$validatedData = $this->validate($request, [
+                'name' => 'required|min:3|max:255|string',
+                'product_id' => 'required',
+            ]);*/
 
-            $discount_type = DiscountType::create($validatedData);
+            if ($request->validated()) {
+                $attribute = ProductAttribute::create($request->all());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Record created successfully!',
-                'discount_type' => $discount_type,
-            ]);
-        } else {
-            return response()->json([
-                'message' => $check_authentication,
-            ], 200);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Record created successfully!',
+                    'attribute' => $attribute,
+                ]);
+            } else {
+                return response()->json([
+                    'message' => $check_authentication,
+                ], 200);
+            }
         }
     }
 
@@ -60,9 +64,9 @@ class DiscountTypeController extends Controller
      */
     public function show(string $id)
     {
-        $discount_type = DiscountType::find($id);
+        $attribute = ProductAttribute::find($id);
         return response()->json([
-            'discount_type' => $discount_type,
+            'attribute' => $attribute,
         ]);
     }
 
@@ -84,19 +88,19 @@ class DiscountTypeController extends Controller
             $validatedData = $this->validate($request, [
                 'name' => 'required|min:3|max:255|string'
             ]);
-            $discount_type = DiscountType::find($id);
+            $attribute = ProductAttribute::find($id);
 
-            if ($discount_type->update($validatedData)) {
+            if ($attribute->update($request->all())) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Record updated successfully.',
-                    'discount_type' => $discount_type,
+                    'discount_type' => $attribute,
                 ]);
             } else {
                 return response()->json([
                     'success' => false,
                     'message' => 'No record updated.',
-                    'discount_type' => $discount_type,
+                    'discount_type' => $attribute,
                 ]);
             }
         } else {
@@ -113,14 +117,14 @@ class DiscountTypeController extends Controller
     {
         $check_authentication = Auth::user();
         if ($check_authentication && $check_authentication->hasRole('admin')) {
-            $discount_type = DiscountType::find($id);
+            $attribute = ProductAttribute::find($id);
 
-            if (!$discount_type) {
-                return response()->json(['message' => 'Record not found'], Response::HTTP_NOT_FOUND);
+            if (!$attribute) {
+                return response()->json(['message' => 'Attribute not found!'], Response::HTTP_NOT_FOUND);
             }
 
-            $discount_type->delete();
-            return response()->json(['message' => 'Record deleted'], Response::HTTP_OK);
+            $attribute->delete();
+            return response()->json(['message' => 'Attribute deleted.'], Response::HTTP_OK);
         } else {
             return response()->json([
                 'message' => $check_authentication,
