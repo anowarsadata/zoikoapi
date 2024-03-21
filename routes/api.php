@@ -13,7 +13,9 @@ use App\Http\Controllers\Api\ProductCategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\DiscountTypeController;
 use App\Http\Controllers\Api\ProductAttributeController;
-
+use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\StateController;
+use App\Http\Controllers\Api\CityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,7 +85,31 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('pro/attribute/create', [ProductAttributeController::class, 'store'])->middleware('auth:api');
     Route::post('pro/attribute/update/{id}', [ProductAttributeController::class, 'update'])->middleware('auth:api');
     Route::delete('pro/attribute/delete/{id}', [ProductAttributeController::class, 'destroy'])->middleware('auth:api');
+
+    // Countries
+    Route::get('countries', [CountryController::class, 'index']);
+    Route::get('country/{id}', [CountryController::class, 'show']);
+    Route::post('country/create', [CountryController::class, 'store'])->middleware('auth:api');
+    Route::post('country/update/{id}', [CountryController::class, 'update'])->middleware('auth:api');
+    Route::delete('country/delete/{id}', [CountryController::class, 'destroy'])->middleware('auth:api');
+
+    // States
+    Route::get('states/{id}', [StateController::class, 'index']);
+    Route::get('states/country/{id}', [StateController::class, 'index']);
+    Route::get('state/{id}', [StateController::class, 'show']);
+    Route::post('state/create', [StateController::class, 'store'])->middleware('auth:api');
+    Route::post('state/update/{id}', [StateController::class, 'update'])->middleware('auth:api');
+    Route::delete('state/delete/{id}', [StateController::class, 'destroy'])->middleware('auth:api');
+
+    // Cities
+    Route::get('cities/{id}', [CityController::class, 'index']);
+    Route::get('cities/state/{id}', [CityController::class, 'index']);
+    Route::get('city/{id}', [CityController::class, 'show']);
+    Route::post('city/create', [CityController::class, 'store'])->middleware('auth:api');
+    Route::post('city/update/{id}', [CityController::class, 'update'])->middleware('auth:api');
+    Route::delete('city/delete/{id}', [CityController::class, 'destroy'])->middleware('auth:api');
 });
+
 
 
 
