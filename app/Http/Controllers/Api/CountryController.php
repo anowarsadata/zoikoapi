@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Country;
+use App\Models\State;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -120,14 +122,32 @@ class CountryController extends Controller
     {
         $check_authentication = Auth::user();
         if ($check_authentication && $check_authentication->hasRole('admin')) {
-            $discount_type = Country::find($id);
+            $country = Country::find($id);
 
-            if (!$discount_type) {
+            if (!$country) {
                 return response()->json(['message' => 'Record not found'], Response::HTTP_NOT_FOUND);
+            } else {
+                $states = State::where('country_id', '=', $id)->get();
+                if ($states) {
+                    foreach ($states as $state) {
+                        $cities = City::where('state_id', '=', $state->id)->get();
+                        if ($cities) {
+                            foreach ($cities as $city) {
+                                $city->delete();
+                            }
+                        }
+                        $state->delete();
+                    }
+                }
             }
 
-            $discount_type->delete();
-            return response()->json(['message' => 'Record deleted'], Response::HTTP_OK);
+            $country->delete();
+            return response()->json([
+                'message' => 'Record deleted',
+                'countries' => $country,
+                'states' => $states,
+                'cities' => $cities,
+            ], Response::HTTP_OK);
         } else {
             return response()->json([
                 'message' => $check_authentication,

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\State;
 use Auth;
 use Illuminate\Http\Request;
@@ -120,14 +121,25 @@ class StateController extends Controller
     {
         $check_authentication = Auth::user();
         if ($check_authentication && $check_authentication->hasRole('admin')) {
-            $discount_type = State::find($id);
+            $states = State::find($id);
 
-            if (!$discount_type) {
+            if (!$states) {
                 return response()->json(['message' => 'Record not found'], Response::HTTP_NOT_FOUND);
+            } else {
+                $cities = City::where('state_id', '=', $id)->get();
+                if ($cities) {
+                    foreach ($cities as $city) {
+                        $city->delete();
+                    }
+                }
             }
 
-            $discount_type->delete();
-            return response()->json(['message' => 'Record deleted'], Response::HTTP_OK);
+            $states->delete();
+            return response()->json([
+                'message' => 'Record deleted',
+                'states' => $states,
+                'cities' => $cities,
+            ], Response::HTTP_OK);
         } else {
             return response()->json([
                 'message' => $check_authentication,
