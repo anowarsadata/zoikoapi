@@ -16,6 +16,9 @@ use App\Http\Controllers\Api\ProductAttributeController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\StateController;
 use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\CurrencyController;
+use App\Http\Controllers\Api\FaqController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -94,7 +97,6 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::delete('country/delete/{id}', [CountryController::class, 'destroy'])->middleware('auth:api');
 
     // States
-    Route::get('states/{id}', [StateController::class, 'index']);
     Route::get('states/country/{id}', [StateController::class, 'index']);
     Route::get('state/{id}', [StateController::class, 'show']);
     Route::post('state/create', [StateController::class, 'store'])->middleware('auth:api');
@@ -102,12 +104,26 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::delete('state/delete/{id}', [StateController::class, 'destroy'])->middleware('auth:api');
 
     // Cities
-    Route::get('cities/{id}', [CityController::class, 'index']);
     Route::get('cities/state/{id}', [CityController::class, 'index']);
     Route::get('city/{id}', [CityController::class, 'show']);
     Route::post('city/create', [CityController::class, 'store'])->middleware('auth:api');
     Route::post('city/update/{id}', [CityController::class, 'update'])->middleware('auth:api');
     Route::delete('city/delete/{id}', [CityController::class, 'destroy'])->middleware('auth:api');
+
+    // Currencies
+    Route::get('currencies', [CurrencyController::class, 'index']);
+    Route::get('currency/{id}', [CurrencyController::class, 'show']);
+    Route::get('currency/country/{id}', [CurrencyController::class, 'get_currency']);
+    Route::post('currency/create', [CurrencyController::class, 'store'])->middleware('auth:api');
+    Route::post('currency/update/{id}', [CurrencyController::class, 'update'])->middleware('auth:api');
+    Route::delete('currency/delete/{id}', [CurrencyController::class, 'destroy'])->middleware('auth:api');
+
+    // FAQ
+    Route::get('faqs', [FaqController::class, 'index']);
+    Route::get('faq/{id}', [FaqController::class, 'show']);
+    Route::post('faq/create', [FaqController::class, 'store'])->middleware('auth:api');
+    Route::post('faq/update/{id}', [FaqController::class, 'update'])->middleware('auth:api');
+    Route::delete('faq/delete/{id}', [FaqController::class, 'destroy'])->middleware('auth:api');
 });
 
 
