@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\MenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
@@ -124,6 +125,14 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('faq/create', [FaqController::class, 'store'])->middleware('auth:api');
     Route::post('faq/update/{id}', [FaqController::class, 'update'])->middleware('auth:api');
     Route::delete('faq/delete/{id}', [FaqController::class, 'destroy'])->middleware('auth:api');
+
+    // Menus
+    Route::get('menus', [MenuController::class, 'index']);
+    Route::get('menu/{id}', [MenuController::class, 'show']);
+    Route::post('menu/create', [MenuController::class, 'store'])->middleware('auth:api');
+    Route::post('menu/update/{id}', [MenuController::class, 'update'])->middleware('auth:api');
+    Route::delete('menu/delete/{id}', [MenuController::class, 'destroy'])->middleware('auth:api');
+
 });
 
 

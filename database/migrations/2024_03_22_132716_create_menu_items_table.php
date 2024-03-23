@@ -10,15 +10,15 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('menu_items', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('menu_id')->unsigned()->nullable();
             $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->foreignId('role_id')->default(2);
-            $table->string('password');
-            $table->integer('status');
-            $table->rememberToken();
+            $table->string('url');
+            $table->string('target')->nullable();
+            $table->string('css_class')->nullable();
+            $table->string('css_id')->nullable();
+            $table->integer('item_order')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('menu_items');
     }
 };
