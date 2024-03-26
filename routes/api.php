@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\MenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
@@ -19,7 +18,8 @@ use App\Http\Controllers\Api\StateController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\FaqController;
-
+use App\Http\Controllers\Api\MenuController;
+use App\Http\Controllers\Api\MenuItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -132,6 +132,14 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('menu/create', [MenuController::class, 'store'])->middleware('auth:api');
     Route::post('menu/update/{id}', [MenuController::class, 'update'])->middleware('auth:api');
     Route::delete('menu/delete/{id}', [MenuController::class, 'destroy'])->middleware('auth:api');
+
+    // Menu items
+    Route::get('items/menu/{id}', [MenuItemController::class, 'index']); // By menu Id
+    Route::get('item/{id}', [MenuItemController::class, 'show']); // By menu item Id
+    Route::post('item/menu/create', [MenuItemController::class, 'store'])->middleware('auth:api');
+    Route::post('item/menu/update/{id}', [MenuItemController::class, 'update'])->middleware('auth:api');
+    Route::delete('item/menu/delete/{id}', [MenuItemController::class, 'destroy'])->middleware('auth:api');
+
 
 });
 
