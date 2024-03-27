@@ -202,7 +202,7 @@ class AuthenticationController extends Controller
             $rules['email'] = 'unique:users|required';
         }
 
-        if (isset ($rules)) {
+        if (isset($rules)) {
             $input = $request->only('name', 'email', 'password');
             $validator = Validator::make($input, $rules);
             if ($validator->fails()) {
@@ -212,7 +212,7 @@ class AuthenticationController extends Controller
 
         $user->name = $request->name;
         $user->email = $request->email;
-        if (!empty ($request->password)) {
+        if (!empty($request->password)) {
             $user->password = Hash::make($request->password);
         }
         $user->updated_at = date("Y-m-d H:i:s");

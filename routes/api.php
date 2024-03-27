@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\AuthenticationController;
@@ -20,6 +21,8 @@ use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\MenuItemController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,6 +64,12 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('password/email', [ForgotPasswordController::class, '__invoke']);
     Route::post('password/code/check', [CodeCheckController::class, '__invoke']);
     Route::post('password/reset', [ResetPasswordController::class, '__invoke'])->middleware('auth:api');
+
+    // User Address
+    Route::post('address/create', [UserAddressController::class, 'store'])->middleware('auth:api');
+    Route::post('address/update/{id}', [UserAddressController::class, 'update'])->middleware('auth:api');
+    Route::get('addresses/user/{id}', [UserAddressController::class, 'show'])->middleware('auth:api');
+    Route::delete('address/delete/{id}', [UserAddressController::class, 'destroy'])->middleware('auth:api');
 
     //Product Routes
     Route::get('products', [ProductController::class, 'index']);
@@ -139,6 +148,14 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::post('item/menu/create', [MenuItemController::class, 'store'])->middleware('auth:api');
     Route::post('item/menu/update/{id}', [MenuItemController::class, 'update'])->middleware('auth:api');
     Route::delete('item/menu/delete/{id}', [MenuItemController::class, 'destroy'])->middleware('auth:api');
+
+    // Cart
+    Route::get('cart/user/{id}', [CartController::class, 'show'])->middleware('auth:api');
+    Route::post('cart/create', [CartController::class, 'store'])->middleware('auth:api');
+    Route::delete('cart/delete/{id}', [CartController::class, 'destroy'])->middleware('auth:api');
+
+    // Cart items
+    Route::post('cart/item/create', [CartItemController::class, 'store'])->middleware('auth:api');
 
 
 });
