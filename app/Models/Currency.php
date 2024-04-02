@@ -9,4 +9,8 @@ class Currency extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'symbol', 'country_id'];
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

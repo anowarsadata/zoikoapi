@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -102,7 +103,10 @@ class CartController extends Controller
         }
 
         $cart->delete();
-        return response()->json(['message' => 'Record deleted'], Response::HTTP_OK);
+        return response()->json([
+            'message' => 'Record deleted',
+            'cart' => $cart,
+        ], Response::HTTP_OK);
         /* } else {
              return response()->json([
                  'message' => $check_authentication,

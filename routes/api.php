@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Api\ContactController;
@@ -156,7 +157,14 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
 
     // Cart items
     Route::post('cart/item/create', [CartItemController::class, 'store'])->middleware('auth:api');
+    Route::post('cart/item/update/{id}', [CartItemController::class, 'update'])->middleware('auth:api');
+    Route::delete('cart/item/delete/{id}', [CartItemController::class, 'destroy'])->middleware('auth:api');
 
+    // Orders
+    Route::post('order/create', [OrderController::class, 'store'])->middleware('auth:api');
+    Route::get('orders/all', [OrderController::class, 'index'])->middleware('auth:api');
+    Route::get('order/{id}', [OrderController::class, 'show'])->middleware('auth:api');
+    Route::get('orders/user/{id}', [OrderController::class, 'get_orders_by_user_id'])->middleware('auth:api');
 
 });
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CartItemController extends Controller
 {
@@ -75,11 +76,36 @@ class CartItemController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage usig cart item id.
      */
     public function update(Request $request, string $id)
     {
-        //
+        //$check_authentication = Auth::user();
+        //if ($check_authentication && $check_authentication->hasRole('admin')) {
+        $validatedData = $this->validate($request, [
+            'quantity' => 'required|integer',
+        ]);
+        $cart_item = CartItem::find($id);
+        if ($validatedData) {
+            if ($cart_item->update($request->all())) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Record updated successfully.',
+                    'cart_item' => $cart_item,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No record updated.',
+                    'city' => $cart_item,
+                ]);
+            }
+        }
+        /*} else {
+            return response()->json([
+                'message' => $check_authentication,
+            ], 200);
+        }*/
     }
 
     /**
@@ -87,6 +113,20 @@ class CartItemController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        //$check_authentication = Auth::user();
+        //if ($check_authentication) {
+        $cart_item = CartItem::find($id);
+
+        if (!$cart_item) {
+            return response()->json(['message' => 'Record not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $cart_item->delete();
+        return response()->json(['message' => 'Record deleted'], Response::HTTP_OK);
+        /* } else {
+             return response()->json([
+                 'message' => $check_authentication,
+             ], 200);
+         }*/
     }
 }
