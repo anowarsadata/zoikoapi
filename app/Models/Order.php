@@ -17,6 +17,8 @@ class Order extends Model
         'subtotal',
         'total',
         'subtotal',
+        'remarks',
+        'status',
     ];
 
     public function users()
@@ -26,5 +28,10 @@ class Order extends Model
     public function currencies()
     {
         return $this->belongsToMany(Currency::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

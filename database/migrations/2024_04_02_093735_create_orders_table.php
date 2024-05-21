@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('payment_method')->nullable();
             $table->string('subtotal')->nullable();
             $table->string('total')->nullable();
+            $table->string('remarks')->nullable();
             $table->string('status')->nullable()->default('pending');
             $table->timestamps();
         });

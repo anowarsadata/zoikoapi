@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\EmailTemplateController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OrderItemController;
 use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Api\ContactController;
@@ -165,7 +167,19 @@ Route::group(['namespace' => 'api', 'prefix' => 'v1'], function () {
     Route::get('orders/all', [OrderController::class, 'index'])->middleware('auth:api');
     Route::get('order/{id}', [OrderController::class, 'show'])->middleware('auth:api');
     Route::get('orders/user/{id}', [OrderController::class, 'get_orders_by_user_id'])->middleware('auth:api');
+    Route::post('order/update/{id}', [OrderController::class, 'update'])->middleware('auth:api');
+    Route::post('order/cancel/{id}', [OrderController::class, 'cancel'])->middleware('auth:api');
+    Route::delete('order/delete/{id}', [OrderController::class, 'destroy'])->middleware('auth:api');
 
+    // Order items
+    Route::post('order/item/create', [OrderItemController::class, 'store'])->middleware('auth:api');
+
+    // Email Templates
+    Route::post('email-template/create', [EmailTemplateController::class, 'store'])->middleware('auth:api');
+    Route::post('email-template/update/{id}', [EmailTemplateController::class, 'update'])->middleware('auth:api');
+    Route::get('email-templates', [EmailTemplateController::class, 'index'])->middleware('auth:api');
+    Route::get('email-template/{id}', [EmailTemplateController::class, 'show'])->middleware('auth:api');
+    Route::delete('email-template/delete/{id}', [EmailTemplateController::class, 'destroy'])->middleware('auth:api');
 });
 
 

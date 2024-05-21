@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
@@ -124,16 +125,99 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $check_authentication = Auth::user();
+        if ($check_authentication && $check_authentication->hasRole('admin')) {
+            $order = Order::find($id);
+            if ($order) {
+                if ($order->update($request->all())) {
+                    return response()->json([
+                        "success" => true,
+                        'message' => 'Record updated.',
+                        $order,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        "success" => false,
+                        'message' => 'No record updated!',
+                        $order,
+                    ], 200);
+                }
+            } else {
+                return response()->json([
+                    "success" => false,
+                    'message' => 'No record found!.',
+                    $order,
+                ], 200);
+            }
+
+        } else {
+            return response()->json([
+                'message' => $check_authentication,
+            ], 200);
+        }
     }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function cancel(Request $request, $id)
+    {
+        $check_authentication = Auth::user();
+        if ($check_authentication) {
+            $validatedData = $this->validate($request, [
+                'status' => 'required|string',
+                'remarks' => 'required|string',
+            ]);
+            $order = Order::find($id);
+            if ($order) {
+                if ($order->update($request->all())) {
+                    return response()->json([
+                        "success" => true,
+                        'message' => 'Record updated.',
+                        $order,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        "success" => false,
+                        'message' => 'No record updated!',
+                        $order,
+                    ], 200);
+                }
+            } else {
+                return response()->json([
+                    "success" => false,
+                    'message' => 'No record found!.',
+                    $order,
+                ], 200);
+            }
+
+        } else {
+            return response()->json([
+                'message' => $check_authentication,
+            ], 200);
+        }
+    }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $check_authentication = Auth::user();
+        if ($check_authentication && $check_authentication->hasRole('admin')) {
+            $product = Order::find($id);
+            if (!$product) {
+                return response()->json(['message' => 'Product not found'], Response::HTTP_NOT_FOUND);
+            }
+            $product->delete();
+            return response()->json(['message' => 'Product deleted'], Response::HTTP_OK);
+        } else {
+            return response()->json([
+                'message' => $check_authentication,
+            ], 200);
+        }
     }
 }
