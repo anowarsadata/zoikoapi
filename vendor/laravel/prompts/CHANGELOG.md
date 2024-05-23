@@ -1,6 +1,30 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/prompts/compare/v0.1.15...main)
+## [Unreleased](https://github.com/laravel/prompts/compare/v0.1.20...main)
+
+## [v0.1.20](https://github.com/laravel/prompts/compare/v0.1.19...v0.1.20) - 2024-04-18
+
+* Fix for up/down arrows + cursor position when textarea content contains multi-byte strings by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/prompts/pull/137
+
+## [v0.1.19](https://github.com/laravel/prompts/compare/v0.1.18...v0.1.19) - 2024-04-16
+
+* Fix `multisearch` array handling by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/prompts/pull/132
+* Adds Reversible Forms to Prompts by [@lukeraymonddowning](https://github.com/lukeraymonddowning) in https://github.com/laravel/prompts/pull/118
+* Fix type error in suggest with collection by [@macocci7](https://github.com/macocci7) in https://github.com/laravel/prompts/pull/134
+
+## [v0.1.18](https://github.com/laravel/prompts/compare/v0.1.17...v0.1.18) - 2024-04-04
+
+* Add Component: Multiline Text Input by [@joetannenbaum](https://github.com/joetannenbaum) in https://github.com/laravel/prompts/pull/88
+* Remove terminal height requirement by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/prompts/pull/128
+
+## [v0.1.17](https://github.com/laravel/prompts/compare/v0.1.16...v0.1.17) - 2024-03-13
+
+* [0.x] Fix box spacing with Symfony named style tags by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/prompts/pull/125
+
+## [v0.1.16](https://github.com/laravel/prompts/compare/v0.1.15...v0.1.16) - 2024-02-21
+
+* [0.x] Fix `multisearch` long option truncation by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/prompts/pull/114
+* Added pause prompt by [@allanmcarvalho](https://github.com/allanmcarvalho) in https://github.com/laravel/prompts/pull/108
 
 ## [v0.1.15](https://github.com/laravel/prompts/compare/v0.1.14...v0.1.15) - 2023-12-29
 

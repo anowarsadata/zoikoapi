@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace League\Flysystem\Ftp;
 
+use const FTP_USEPASVADDRESS;
 use function error_clear_last;
 use function error_get_last;
-use const FTP_USEPASVADDRESS;
 
 class FtpConnectionProvider implements ConnectionProvider
 {

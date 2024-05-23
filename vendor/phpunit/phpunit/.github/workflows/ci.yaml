@@ -1,8 +1,10 @@
 # https://docs.github.com/en/actions
 
 on:
-  - pull_request
-  - push
+  pull_request: null
+  push: null
+  schedule:
+    - cron: "15 0 * * *"
 
 name: CI
 
@@ -17,6 +19,7 @@ jobs:
     name: Dependency Validation
 
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -39,7 +42,10 @@ jobs:
   coding-guidelines:
     name: Coding Guidelines
 
+    if: github.event_name != 'schedule'
+
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -59,10 +65,13 @@ jobs:
   type-checker:
     name: Type Checker
 
+    if: github.event_name != 'schedule'
+
     needs:
       - dependency-validation
 
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -92,6 +101,7 @@ jobs:
       - dependency-validation
 
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
 
     env:
       PHP_EXTENSIONS: none, ctype, curl, dom, json, libxml, mbstring, openssl, phar, soap, tokenizer, xml, xmlwriter
@@ -130,7 +140,7 @@ jobs:
         run: php ./tools/composer install --no-ansi --no-interaction --no-progress
 
       - name: Run tests with PHPUnit
-        run: php ./phpunit --testsuite unit
+        run: php ./phpunit --testsuite unit --order-by depends,random
 
   end-to-end-tests:
     name: End-to-End Tests
@@ -139,6 +149,7 @@ jobs:
       - unit-tests
 
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
 
     env:
       PHP_EXTENSIONS: none, ctype, curl, dom, json, libxml, mbstring, openssl, phar, soap, tokenizer, xml, xmlwriter
@@ -178,15 +189,18 @@ jobs:
         run: php ./tools/composer install --no-ansi --no-interaction --no-progress
 
       - name: Run tests with PHPUnit
-        run: php ./phpunit --testsuite end-to-end
+        run: php ./phpunit --testsuite end-to-end --order-by depends,random
 
   code-coverage:
     name: Code Coverage
+
+    if: github.event_name != 'schedule'
 
     needs:
       - end-to-end-tests
 
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -215,10 +229,13 @@ jobs:
   build-phar:
     name: Build PHAR
 
+    if: github.event_name != 'schedule'
+
     needs:
       - end-to-end-tests
 
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     env:
       PHP_EXTENSIONS: none, ctype, dom, json, fileinfo, iconv, libxml, mbstring, phar, soap, tokenizer, xml, xmlwriter
@@ -247,7 +264,7 @@ jobs:
         run: ant phar-snapshot
 
       - name: Check whether PHAR is scoped
-        run: cat build/artifacts/phpunit-snapshot.phar | grep -q PHPUnit\\\\DeepCopy\\\\Exception\\\\CloneException || (echo "phpunit-snapshot.phar is not scoped." && false)
+        run: grep -q PHPUnitPHAR\\\\DeepCopy\\\\Exception\\\\CloneException build/artifacts/phpunit-snapshot.phar || (echo "phpunit-snapshot.phar is not scoped." && false)
 
       - name: Upload PHAR
         uses: actions/upload-artifact@v4
@@ -260,10 +277,13 @@ jobs:
   test-phar:
     name: Test PHAR
 
+    if: github.event_name != 'schedule'
+
     needs:
       - build-phar
 
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     env:
       PHP_EXTENSIONS: none, ctype, curl, dom, json, fileinfo, iconv, libxml, mbstring, phar, soap, tokenizer, xml, xmlwriter

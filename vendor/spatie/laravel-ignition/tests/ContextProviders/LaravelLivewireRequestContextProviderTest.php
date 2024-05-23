@@ -6,8 +6,8 @@ use Spatie\LaravelIgnition\ContextProviders\LaravelLivewireRequestContextProvide
 use Spatie\LaravelIgnition\Tests\TestClasses\FakeLivewireManager;
 
 beforeEach(function () {
-    $this->livewireManager = FakeLivewireManager::setUp();
-})->skip(LIVEWIRE_VERSION_3, 'Missing Livewire 3 support.');
+    $this->livewireManager = resolve(FakeLivewireManager::class);
+})->skip(LIVEWIRE_VERSION_2, 'Only test Livewire 3.');
 
 it('returns the referer url and method', function () {
     $context = createRequestContext([
@@ -17,15 +17,15 @@ it('returns the referer url and method', function () {
 
     $request = $context->getRequest();
 
-    expect($request['url'])->toBe('http://localhost/referred');
-    expect($request['method'])->toBe('GET');
+    expect($request['url'])->toBe('http://localhost/POST');
+    expect($request['method'])->toBe('POST');
 });
 
 it('returns livewire component information', function () {
     $alias = 'fake-component';
     $class = 'fake-class';
 
-    $this->livewireManager->fakeAliases[$alias] = $class;
+    $this->livewireManager->addAlias($alias, $class);
 
     $context = createRequestContext([
         'path' => 'http://localhost/referred',
@@ -36,9 +36,8 @@ it('returns livewire component information', function () {
 
     $livewire = $context->toArray()['livewire'];
 
-    expect($livewire['component_id'])->toBe($id);
-    expect($livewire['component_alias'])->toBe($alias);
-    expect($livewire['component_class'])->toBe($class);
+    expect($livewire[0]['component_id'])->toBe($id);
+    expect($livewire[0]['component_alias'])->toBe($alias);
 });
 
 it('returns livewire component information when it does not exist', function () {
@@ -51,9 +50,9 @@ it('returns livewire component information when it does not exist', function () 
 
     $livewire = $context->toArray()['livewire'];
 
-    expect($livewire['component_id'])->toBe($id);
-    expect($livewire['component_alias'])->toBe($name);
-    expect($livewire['component_class'])->toBeNull();
+    expect($livewire[0]['component_id'])->toBe($id);
+    expect($livewire[0]['component_alias'])->toBe($name);
+    expect($livewire[0]['component_class'])->toBeNull();
 });
 
 it('removes ids from update payloads', function () {
@@ -75,9 +74,9 @@ it('removes ids from update payloads', function () {
 
     $livewire = $context->toArray()['livewire'];
 
-    expect($livewire['component_id'])->toBe($id);
-    expect($livewire['component_alias'])->toBe($name);
-    expect($livewire['component_class'])->toBeNull();
+    expect($livewire[0]['component_id'])->toBe($id);
+    expect($livewire[0]['component_alias'])->toBe($name);
+    expect($livewire[0]['component_class'])->toBeNull();
 });
 
 it('combines data into one payload', function () {
@@ -150,7 +149,7 @@ it('combines data into one payload', function () {
         "collection" => ['a', 'b'],
         "stringable" => "Test",
         "wireable" => ['a', 'b'],
-    ], $livewire['data']);
+    ], $livewire[0]['data']);
 });
 
 // Helpers

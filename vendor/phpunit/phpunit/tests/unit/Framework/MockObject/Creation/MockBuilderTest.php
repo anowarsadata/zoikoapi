@@ -14,9 +14,12 @@ use function mt_rand;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Medium;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\TestFixture\MockObject\AbstractClass;
 use PHPUnit\TestFixture\MockObject\ExtendableClass;
 use PHPUnit\TestFixture\MockObject\InterfaceWithReturnTypeDeclaration;
+use PHPUnit\TestFixture\MockObject\TraitWithConcreteAndAbstractMethod;
 
 #[CoversClass(MockBuilder::class)]
 #[CoversClass(CannotUseAddMethodsException::class)]
@@ -26,6 +29,7 @@ use PHPUnit\TestFixture\MockObject\InterfaceWithReturnTypeDeclaration;
 #[Medium]
 final class MockBuilderTest extends TestCase
 {
+    #[TestDox('setMockClassName() can be used to configure the name of the mock object class')]
     public function testCanCreateMockObjectWithSpecifiedClassName(): void
     {
         $className = 'random_' . md5((string) mt_rand());
@@ -37,6 +41,7 @@ final class MockBuilderTest extends TestCase
         $this->assertSame($className, $double::class);
     }
 
+    #[TestDox('addMethods() can be used to configure an additional method for the mock object class when the original class does not have a method of the same name')]
     public function testCanCreateMockObjectForExtendableClassWhileAddingMethodsToIt(): void
     {
         $double = $this->getMockBuilder(ExtendableClass::class)
@@ -50,6 +55,7 @@ final class MockBuilderTest extends TestCase
         $this->assertSame($value, $double->additionalMethod());
     }
 
+    #[TestDox('addMethods() cannot be used to configure an additional method for the mock object class when the original class has a method of the same name')]
     public function testCannotCreateMockObjectForExtendableClassAddingMethodsToItThatItAlreadyHas(): void
     {
         $this->expectException(CannotUseAddMethodsException::class);
@@ -57,5 +63,39 @@ final class MockBuilderTest extends TestCase
         $this->getMockBuilder(ExtendableClass::class)
             ->addMethods(['doSomething'])
             ->getMock();
+    }
+
+    #[TestDox('getMockForAbstractClass() can be used to create a mock object for an abstract class')]
+    public function testCreatesMockObjectForAbstractClassAndAllowsConfigurationOfAbstractMethods(): void
+    {
+        $mock = $this->getMockBuilder(AbstractClass::class)
+            ->getMockForAbstractClass();
+
+        $mock->expects($this->once())->method('doSomethingElse')->willReturn(true);
+
+        $this->assertTrue($mock->doSomething());
+    }
+
+    #[TestDox('getMockForTrait() can be used to create a mock object for a trait')]
+    public function testCreatesMockObjectForTraitAndAllowsConfigurationOfMethods(): void
+    {
+        $mock = $this->getMockBuilder(TraitWithConcreteAndAbstractMethod::class)
+            ->getMockForTrait();
+
+        $mock->method('abstractMethod')->willReturn(true);
+
+        $this->assertTrue($mock->concreteMethod());
+    }
+
+    #[TestDox('onlyMethods() can be used to configure which methods should be doubled')]
+    public function testCreatesPartialMockObjectForExtendableClass(): void
+    {
+        $mock = $this->getMockBuilder(ExtendableClass::class)
+            ->onlyMethods(['doSomethingElse'])
+            ->getMock();
+
+        $mock->expects($this->once())->method('doSomethingElse')->willReturn(true);
+
+        $this->assertTrue($mock->doSomething());
     }
 }

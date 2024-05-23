@@ -1,6 +1,20 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/sanctum/compare/v3.3.2...3.x)
+## [Unreleased](https://github.com/laravel/sanctum/compare/v4.0.1...4.x)
+
+## [v4.0.1](https://github.com/laravel/sanctum/compare/v4.0.0...v4.0.1) - 2024-03-19
+
+* [4.x] Make commands lazy by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/sanctum/pull/502
+
+## [v4.0.0](https://github.com/laravel/sanctum/compare/v3.3.3...v4.0.0) - 2024-03-12
+
+* [4.x] Adds Laravel 11 support by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/sanctum/pull/480
+* Matching method to contract for createToken() by [@gammamatrix](https://github.com/gammamatrix) in https://github.com/laravel/sanctum/pull/498
+
+## [v3.3.3](https://github.com/laravel/sanctum/compare/v3.3.2...v3.3.3) - 2023-12-19
+
+* Updated `CsrfCookieController` to use named arguments by [@OussamaMater](https://github.com/OussamaMater) in https://github.com/laravel/sanctum/pull/487
+* Extract generate token method by [@mowangjuanzi](https://github.com/mowangjuanzi) in https://github.com/laravel/sanctum/pull/488
 
 ## [v3.3.2](https://github.com/laravel/sanctum/compare/v3.3.1...v3.3.2) - 2023-11-03
 

@@ -2,6 +2,74 @@
 
 All notable changes to `laravel-ignition` will be documented in this file
 
+## 2.6.2 - 2024-04-30
+
+### What's Changed
+
+* Fix for some middlewares not being executed by @rubenvanassche in https://github.com/spatie/laravel-ignition/pull/199
+
+**Full Changelog**: https://github.com/spatie/laravel-ignition/compare/2.6.1...2.6.2
+
+## 2.6.1 - 2024-04-30
+
+### What's Changed
+
+* Adding missing ComponentRegistry import by @matthewscalf in https://github.com/spatie/laravel-ignition/pull/196
+* Fix view traces by @rubenvanassche in https://github.com/spatie/laravel-ignition/pull/189
+
+**Full Changelog**: https://github.com/spatie/laravel-ignition/compare/2.6.0...2.6.1
+
+## 2.6.0 - 2024-04-29
+
+### What's Changed
+
+* Livewire 3 by @timvandijck en @riasvdv in https://github.com/spatie/laravel-ignition/pull/193
+
+## 2.5.2 - 2024-04-16
+
+### What's Changed
+
+* Fix octane by @rubenvanassche in https://github.com/spatie/laravel-ignition/pull/187
+
+**Full Changelog**: https://github.com/spatie/laravel-ignition/compare/2.5.1...2.5.2
+
+## 2.5.1 - 2024-04-02
+
+### What's Changed
+
+* Update Context middleware by @stayallive in https://github.com/spatie/laravel-ignition/pull/185
+* fix: move string check/decode for data in payload by @jryd in https://github.com/spatie/laravel-ignition/pull/186
+
+### New Contributors
+
+* @stayallive made their first contribution in https://github.com/spatie/laravel-ignition/pull/185
+* @jryd made their first contribution in https://github.com/spatie/laravel-ignition/pull/186
+
+**Full Changelog**: https://github.com/spatie/laravel-ignition/compare/2.5.0...2.5.1
+
+## 2.5.0 - 2024-03-29
+
+### What's Changed
+
+* Add unknown collations for MySQL 8 and MariaDB by @Jubeki in https://github.com/spatie/laravel-ignition/pull/171
+* Add support for context by @freekmurze in https://github.com/spatie/laravel-ignition/pull/184
+* Bump dependabot/fetch-metadata from 1 to 2 by @dependabot in https://github.com/spatie/laravel-ignition/pull/183
+
+**Full Changelog**: https://github.com/spatie/laravel-ignition/compare/2.4.2...2.5.0
+
+## 2.4.2 - 2024-02-09
+
+### What's Changed
+
+* Bump actions/cache from 3 to 4 by @dependabot in https://github.com/spatie/laravel-ignition/pull/178
+* Add some sensible defaults for headers that should be sensored. by @timvandijck in https://github.com/spatie/laravel-ignition/pull/180
+
+### New Contributors
+
+* @timvandijck made their first contribution in https://github.com/spatie/laravel-ignition/pull/180
+
+**Full Changelog**: https://github.com/spatie/laravel-ignition/compare/2.4.1...2.4.2
+
 ## 2.4.1 - 2024-01-12
 
 ### What's Changed

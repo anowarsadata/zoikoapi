@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\InvalidDataProviderException;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\TestFixture\DuplicateKeyDataProvidersTest;
 use PHPUnit\TestFixture\DuplicateKeyDataProviderTest;
 use PHPUnit\TestFixture\MultipleDataProviderTest;
 use PHPUnit\TestFixture\VariousIterableDataProviderTest;
@@ -156,12 +157,21 @@ final class DataProviderTest extends TestCase
         ], $dataSets);
     }
 
-    public function testWithDuplicateKeyDataProviders(): void
+    public function testWithDuplicateKeyDataProvider(): void
     {
         $this->expectException(InvalidDataProviderException::class);
         $this->expectExceptionMessage('The key "foo" has already been defined by a previous data provider');
 
         /* @noinspection UnusedFunctionResultInspection */
         (new DataProvider)->providedData(DuplicateKeyDataProviderTest::class, 'test');
+    }
+
+    public function testWithDuplicateKeyDataProviders(): void
+    {
+        $this->expectException(InvalidDataProviderException::class);
+        $this->expectExceptionMessage('The key "bar" has already been defined by a previous data provider');
+
+        /* @noinspection UnusedFunctionResultInspection */
+        (new DataProvider)->providedData(DuplicateKeyDataProvidersTest::class, 'test');
     }
 }

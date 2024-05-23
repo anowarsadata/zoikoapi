@@ -31,6 +31,13 @@ use Symfony\Component\ErrorHandler\Tests\Fixtures\LoggerThatSetAnErrorHandler;
  */
 class ErrorHandlerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        $r = new \ReflectionProperty(ErrorHandler::class, 'exitCode');
+        $r->setAccessible(true);
+        $r->setValue(null, 0);
+    }
+
     public function testRegister()
     {
         $handler = ErrorHandler::register();
@@ -154,7 +161,7 @@ class ErrorHandlerTest extends TestCase
             $this->assertSame('Undefined variable $foo', $e->getMessage());
             $this->assertSame(__FILE__, $e->getFile());
             $this->assertSame(0, $e->getCode());
-            $this->assertSame('Symfony\Component\ErrorHandler\{closure}', $trace[0]['function']);
+            $this->assertStringMatchesFormat('%A{closure%A}', $trace[0]['function']);
             $this->assertSame(ErrorHandler::class, $trace[0]['class']);
             $this->assertSame('triggerNotice', $trace[1]['function']);
             $this->assertSame(__CLASS__, $trace[1]['class']);

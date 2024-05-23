@@ -21,7 +21,6 @@ use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
@@ -176,25 +175,6 @@ class ArgumentResolverTest extends TestCase
         $controller = [new VariadicController(), 'action'];
 
         self::getResolver()->getArguments($request, $controller);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetArgumentWithoutArray()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $valueResolver = $this->createMock(ArgumentValueResolverInterface::class);
-        $resolver = self::getResolver([$valueResolver]);
-
-        $valueResolver->expects($this->any())->method('supports')->willReturn(true);
-        $valueResolver->expects($this->any())->method('resolve')->willReturn([]);
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $request->attributes->set('bar', 'foo');
-        $controller = (new ArgumentResolverTestController())->controllerWithFooAndDefaultBar(...);
-        $resolver->getArguments($request, $controller);
     }
 
     public function testIfExceptionIsThrownWhenMissingAnArgument()

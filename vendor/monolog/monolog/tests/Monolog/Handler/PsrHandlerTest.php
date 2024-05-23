@@ -14,6 +14,7 @@ namespace Monolog\Handler;
 use Monolog\Level;
 use Monolog\Test\TestCase;
 use Monolog\Formatter\LineFormatter;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @covers Monolog\Handler\PsrHandler::handle
@@ -28,9 +29,7 @@ class PsrHandlerTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider logLevelProvider
-     */
+    #[DataProvider('logLevelProvider')]
     public function testHandlesAllLevels(string $levelName, Level $level)
     {
         $message = 'Hello, world! ' . $level->value;
@@ -59,5 +58,21 @@ class PsrHandlerTest extends TestCase
         $handler = new PsrHandler($psrLogger);
         $handler->setFormatter(new LineFormatter('dummy'));
         $handler->handle($this->getRecord($level, $message, context: $context, datetime: new \DateTimeImmutable()));
+    }
+
+    public function testIncludeExtra()
+    {
+        $message = 'Hello, world!';
+        $context = ['foo' => 'bar'];
+        $extra = ['baz' => 'boo'];
+        $level = Level::Error;
+
+        $psrLogger = $this->createMock('Psr\Log\NullLogger');
+        $psrLogger->expects($this->once())
+            ->method('log')
+            ->with($level->toPsrLogLevel(), $message, ['baz' => 'boo', 'foo' => 'bar']);
+
+        $handler = new PsrHandler($psrLogger, includeExtra: true);
+        $handler->handle($this->getRecord($level, $message, context: $context, datetime: new \DateTimeImmutable(), extra: $extra));
     }
 }

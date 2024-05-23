@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Grammars\MariaDbGrammar;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
@@ -23,11 +24,14 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Tests\Database\Fixtures\Enums\Bar;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
+
+include_once 'Enums.php';
 
 class DatabaseQueryBuilderTest extends TestCase
 {
@@ -768,17 +772,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
 
         $builder = $this->getBuilder();
-        $period = now()->toPeriod(now()->addDay());
+        $period = now()->startOfDay()->toPeriod(now()->addDay()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([$period->start, $period->end], $builder->getBindings());
+        $this->assertEquals([now()->startOfDay(), now()->addDay()->startOfDay()], $builder->getBindings());
 
         // custom long carbon period date
         $builder = $this->getBuilder();
-        $period = now()->toPeriod(now()->addMonth());
+        $period = now()->startOfDay()->toPeriod(now()->addMonth()->startOfDay());
         $builder->select('*')->from('users')->whereBetween('created_at', $period);
         $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
-        $this->assertEquals([$period->start, $period->end], $builder->getBindings());
+        $this->assertEquals([now()->startOfDay(), now()->addMonth()->startOfDay()], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
@@ -1039,8 +1043,10 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testWhereIntegerInRaw()
     {
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->whereIntegerInRaw('id', ['1a', 2]);
-        $this->assertSame('select * from "users" where "id" in (1, 2)', $builder->toSql());
+        $builder->select('*')->from('users')->whereIntegerInRaw('id', [
+            '1a', 2, Bar::FOO,
+        ]);
+        $this->assertSame('select * from "users" where "id" in (1, 2, 5)', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
 
         $builder = $this->getBuilder();
@@ -1048,8 +1054,9 @@ class DatabaseQueryBuilderTest extends TestCase
             ['id' => '1a'],
             ['id' => 2],
             ['any' => '3'],
+            ['id' => Bar::FOO],
         ]);
-        $this->assertSame('select * from "users" where "id" in (1, 2, 3)', $builder->toSql());
+        $this->assertSame('select * from "users" where "id" in (1, 2, 3, 5)', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
     }
 
@@ -2476,19 +2483,19 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testJoinsWithMultipleNestedJoins()
     {
         $builder = $this->getBuilder();
-        $builder->select('users.id', 'contacts.id', 'contact_types.id', 'countrys.id', 'planets.id')->from('users')->leftJoin('contacts', function ($j) {
+        $builder->select('users.id', 'contacts.id', 'contact_types.id', 'countries.id', 'planets.id')->from('users')->leftJoin('contacts', function ($j) {
             $j->on('users.id', 'contacts.id')
                 ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
-                ->leftJoin('countrys', function ($q) {
-                    $q->on('contacts.country', '=', 'countrys.country')
+                ->leftJoin('countries', function ($q) {
+                    $q->on('contacts.country', '=', 'countries.country')
                         ->join('planets', function ($q) {
-                            $q->on('countrys.planet_id', '=', 'planet.id')
+                            $q->on('countries.planet_id', '=', 'planet.id')
                                 ->where('planet.is_settled', '=', 1)
                                 ->where('planet.population', '>=', 10000);
                         });
                 });
         });
-        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id", "countrys"."id", "planets"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" left join ("countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? and "planet"."population" >= ?) on "contacts"."country" = "countrys"."country") on "users"."id" = "contacts"."id"', $builder->toSql());
+        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id", "countries"."id", "planets"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" left join ("countries" inner join "planets" on "countries"."planet_id" = "planet"."id" and "planet"."is_settled" = ? and "planet"."population" >= ?) on "contacts"."country" = "countries"."country") on "users"."id" = "contacts"."id"', $builder->toSql());
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
@@ -2499,16 +2506,16 @@ class DatabaseQueryBuilderTest extends TestCase
             $j->on('users.id', 'contacts.id')
                 ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
                 ->whereExists(function ($q) {
-                    $q->select('*')->from('countrys')
-                        ->whereColumn('contacts.country', '=', 'countrys.country')
+                    $q->select('*')->from('countries')
+                        ->whereColumn('contacts.country', '=', 'countries.country')
                         ->join('planets', function ($q) {
-                            $q->on('countrys.planet_id', '=', 'planet.id')
+                            $q->on('countries.planet_id', '=', 'planet.id')
                                 ->where('planet.is_settled', '=', 1);
                         })
                         ->where('planet.population', '>=', 10000);
                 });
         });
-        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id") on "users"."id" = "contacts"."id" and exists (select * from "countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? where "contacts"."country" = "countrys"."country" and "planet"."population" >= ?)', $builder->toSql());
+        $this->assertSame('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join ("contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id") on "users"."id" = "contacts"."id" and exists (select * from "countries" inner join "planets" on "countries"."planet_id" = "planet"."id" and "planet"."is_settled" = ? where "contacts"."country" = "countries"."country" and "planet"."population" >= ?)', $builder->toSql());
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
@@ -2632,6 +2639,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $builder = $this->getMySqlBuilder();
         $builder->from('users')->joinLateral(['foo'], 'sub');
+    }
+
+    public function testJoinLateralMariaDb()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getMariaDbBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->from('users')->joinLateral(function ($q) {
+            $q->from('contacts')->whereColumn('contracts.user_id', 'users.id');
+        }, 'sub')->toSql();
     }
 
     public function testJoinLateralSQLite()
@@ -3482,6 +3499,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = foo, "name" = ? where "id" = ?', ['bar', 1])->andReturn(1);
         $result = $builder->from('users')->where('id', '=', 1)->update(['email' => new Raw('foo'), 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+    }
+
+    public function testUpdateMethodWorksWithQueryAsValue()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "credits" = (select sum(credits) from "transactions" where "transactions"."user_id" = "users"."id" and "type" = ?) where "id" = ?', ['foo', 1])->andReturn(1);
+        $result = $builder->from('users')->where('id', '=', 1)->update(['credits' => $this->getBuilder()->from('transactions')->selectRaw('sum(credits)')->whereColumn('transactions.user_id', 'users.id')->where('type', 'foo')]);
+
         $this->assertEquals(1, $result);
     }
 
@@ -4454,6 +4480,14 @@ SQL;
         $this->assertEquals(['foo', 'bar', 'baz'], $builder->getBindings());
     }
 
+    public function testAddBindingWithEnum()
+    {
+        $builder = $this->getBuilder();
+        $builder->addBinding(IntegerStatus::done);
+        $builder->addBinding([NonBackedStatus::done]);
+        $this->assertEquals([2, 'done'], $builder->getBindings());
+    }
+
     public function testMergeBuilders()
     {
         $builder = $this->getBuilder();
@@ -5272,7 +5306,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
-                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" > ?)) order by "created_at" asc limit 17',
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" > ?)) order by "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
             $this->assertEquals([$ts], $builder->bindings['union']);
@@ -5290,6 +5324,105 @@ SQL;
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithMultipleUnionsAndMultipleWheres()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news')->where('extra', 'first'));
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'podcast' as type")->from('podcasts')->where('extra', 'second'));
+        $builder->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+            ['id' => 3, 'created_at' => now(), 'type' => 'podcasts'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where "extra" = ? and ("created_at" > ?)) union (select "id", "created_at", \'podcast\' as type from "podcasts" where "extra" = ? and ("created_at" > ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts], $builder->bindings['where']);
+            $this->assertEquals(['first', $ts, 'second', $ts], $builder->bindings['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionMultipleWheresMultipleOrders()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['id', 'created_at', 'type'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['id' => 1, 'created_at' => $ts, 'type' => 'news']);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at', 'type')->from('videos')->where('extra', 'first');
+        $builder->union($this->getBuilder()->select('id', 'created_at', 'type')->from('news')->where('extra', 'second'));
+        $builder->union($this->getBuilder()->select('id', 'created_at', 'type')->from('podcasts')->where('extra', 'third'));
+        $builder->orderBy('id')->orderByDesc('created_at')->orderBy('type');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now()->addDay(), 'type' => 'video'],
+            ['id' => 1, 'created_at' => now(), 'type' => 'news'],
+            ['id' => 1, 'created_at' => now(), 'type' => 'podcast'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'podcast'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", "type" from "videos" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "news" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "podcasts" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) order by "id" asc, "created_at" desc, "type" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals(['first', 1, 1, $ts, $ts, 'news'], $builder->bindings['where']);
+            $this->assertEquals(['second', 1, 1, $ts, $ts, 'news', 'third', 1, 1, $ts, $ts, 'news'], $builder->bindings ['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['id', 'created_at', 'type'],
         ]), $result);
     }
 
@@ -5319,7 +5452,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
-                '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("start_time" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
+                '(select "id", "is_published", "start_time" as "created_at", \'video\' as type from "videos" where "is_published" = ? and ("start_time" > ?)) union (select "id", "is_published", "created_at", \'news\' as type from "news" where "is_published" = ? and ("created_at" > ?)) order by case when (id = 3 and type="news" then 0 else 1 end), "created_at" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([true, $ts], $builder->bindings['where']);
             $this->assertEquals([true, $ts], $builder->bindings['union']);
@@ -5366,7 +5499,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
-                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ?)) order by "created_at" desc limit 17',
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" < ?)) order by "created_at" desc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts], $builder->bindings['where']);
             $this->assertEquals([$ts], $builder->bindings['union']);
@@ -5413,7 +5546,7 @@ SQL;
 
         $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
             $this->assertEquals(
-                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" < ? or ("start_time" = ? and ("id" > ?)))) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" < ? or ("created_at" = ? and ("id" > ?)))) order by "created_at" desc, "id" asc limit 17',
                 $builder->toSql());
             $this->assertEquals([$ts, $ts, 1], $builder->bindings['where']);
             $this->assertEquals([$ts, $ts, 1], $builder->bindings['union']);
@@ -5431,6 +5564,55 @@ SQL;
             'path' => $path,
             'cursorName' => $cursorName,
             'parameters' => ['created_at', 'id'],
+        ]), $result);
+    }
+
+    public function testCursorPaginateWithUnionWheresAndAliassedOrderColumns()
+    {
+        $ts = now()->toDateTimeString();
+
+        $perPage = 16;
+        $columns = ['test'];
+        $cursorName = 'cursor-name';
+        $cursor = new Cursor(['created_at' => $ts]);
+        $builder = $this->getMockQueryBuilder();
+        $builder->select('id', 'start_time as created_at')->selectRaw("'video' as type")->from('videos');
+        $builder->union($this->getBuilder()->select('id', 'created_at')->selectRaw("'news' as type")->from('news'));
+        $builder->union($this->getBuilder()->select('id', 'init_at as created_at')->selectRaw("'podcast' as type")->from('podcasts'));
+        $builder->orderBy('created_at');
+
+        $builder->shouldReceive('newQuery')->andReturnUsing(function () use ($builder) {
+            return new Builder($builder->connection, $builder->grammar, $builder->processor);
+        });
+
+        $path = 'http://foo.bar?cursor='.$cursor->encode();
+
+        $results = collect([
+            ['id' => 1, 'created_at' => now(), 'type' => 'video'],
+            ['id' => 2, 'created_at' => now(), 'type' => 'news'],
+            ['id' => 3, 'created_at' => now(), 'type' => 'podcast'],
+        ]);
+
+        $builder->shouldReceive('get')->once()->andReturnUsing(function () use ($builder, $results, $ts) {
+            $this->assertEquals(
+                '(select "id", "start_time" as "created_at", \'video\' as type from "videos" where ("start_time" > ?)) union (select "id", "created_at", \'news\' as type from "news" where ("created_at" > ?)) union (select "id", "init_at" as "created_at", \'podcast\' as type from "podcasts" where ("init_at" > ?)) order by "created_at" asc limit 17',
+                $builder->toSql());
+            $this->assertEquals([$ts], $builder->bindings['where']);
+            $this->assertEquals([$ts, $ts], $builder->bindings['union']);
+
+            return $results;
+        });
+
+        Paginator::currentPathResolver(function () use ($path) {
+            return $path;
+        });
+
+        $result = $builder->cursorPaginate($perPage, $columns, $cursorName, $cursor);
+
+        $this->assertEquals(new CursorPaginator($results, $perPage, $cursor, [
+            'path' => $path,
+            'cursorName' => $cursorName,
+            'parameters' => ['created_at'],
         ]), $result);
     }
 
@@ -5493,6 +5675,24 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testWhereJsonOverlapsMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonOverlaps('options', ['en', 'fr']);
+        $this->assertSame('select * from `users` where json_overlaps(`options`, ?)', $builder->toSql());
+        $this->assertEquals(['["en","fr"]'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonOverlaps('users.options->languages', ['en', 'fr']);
+        $this->assertSame('select * from `users` where json_overlaps(`users`.`options`, ?, \'$."languages"\')', $builder->toSql());
+        $this->assertEquals(['["en","fr"]'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonOverlaps('options->languages', new Raw("'[\"en\", \"fr\"]'"));
+        $this->assertSame('select * from `users` where `id` = ? or json_overlaps(`options`, \'["en", "fr"]\', \'$."languages"\')', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
     public function testWhereJsonContainsPostgres()
     {
         $builder = $this->getPostgresBuilder();
@@ -5552,6 +5752,19 @@ SQL;
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContain('options->languages', new Raw("'[\"en\"]'"));
         $this->assertSame('select * from `users` where `id` = ? or not json_contains(`options`, \'["en"]\', \'$."languages"\')', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    public function testWhereJsonDoesntOverlapMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntOverlap('options->languages', ['en', 'fr']);
+        $this->assertSame('select * from `users` where not json_overlaps(`options`, ?, \'$."languages"\')', $builder->toSql());
+        $this->assertEquals(['["en","fr"]'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntOverlap('options->languages', new Raw("'[\"en\", \"fr\"]'"));
+        $this->assertSame('select * from `users` where `id` = ? or not json_overlaps(`options`, \'["en", "fr"]\', \'$."languages"\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 
@@ -6057,6 +6270,14 @@ SQL;
     protected function getMySqlBuilder()
     {
         $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
+
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
+    }
+
+    protected function getMariaDbBuilder()
+    {
+        $grammar = new MariaDbGrammar;
         $processor = m::mock(Processor::class);
 
         return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);

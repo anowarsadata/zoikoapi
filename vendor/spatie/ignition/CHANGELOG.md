@@ -2,6 +2,57 @@
 
 All notable changes to `ignition` will be documented in this file
 
+## 1.14.0 - 2024-04-26
+
+### What's Changed
+
+* Display Livewire 3 data by @riasvdv in https://github.com/spatie/ignition/pull/511
+
+**Full Changelog**: https://github.com/spatie/ignition/compare/1.13.2...1.14.0
+
+## 1.13.2 - 2024-04-16
+
+### What's Changed
+
+* Fix octane by @rubenvanassche in https://github.com/spatie/ignition/pull/606
+
+**Full Changelog**: https://github.com/spatie/ignition/compare/1.13.1...1.13.2
+
+## 1.13.1 - 2024-03-29
+
+### What's Changed
+
+* Change Laravel Context icon
+* Bump dependabot/fetch-metadata from 1.6.0 to 2.0.0 by @dependabot in https://github.com/spatie/ignition/pull/581
+* Bump ramsey/composer-install from 2 to 3 by @dependabot in https://github.com/spatie/ignition/pull/549
+
+**Full Changelog**: https://github.com/spatie/ignition/compare/1.13.0...1.13.1
+
+## 1.13.0 - 2024-03-28
+
+### What's Changed
+
+* Do not interfere with errors that were suppressed by the @ operator. by @netpalantir in https://github.com/spatie/ignition/pull/388
+* Add noopener and noreferrer to external URLs by @RobertBoes in https://github.com/spatie/ignition/pull/435
+* Bump actions/cache from 3 to 4 by @dependabot in https://github.com/spatie/ignition/pull/505
+* Support Laravel context by @freekmurze in https://github.com/spatie/ignition/pull/586
+
+### New Contributors
+
+* @netpalantir made their first contribution in https://github.com/spatie/ignition/pull/388
+* @RobertBoes made their first contribution in https://github.com/spatie/ignition/pull/435
+
+**Full Changelog**: https://github.com/spatie/ignition/compare/1.12.0...1.13.0
+
+## 1.12.0 - 2024-01-03
+
+### What's Changed
+
+* Revert to regular footer
+* Bump actions/setup-node from 3 to 4 by @dependabot in https://github.com/spatie/ignition/pull/432
+
+**Full Changelog**: https://github.com/spatie/ignition/compare/1.11.3...1.12.0
+
 ## 1.11.3 - 2023-10-18
 
 ### What's Changed
@@ -32,13 +83,13 @@ All notable changes to `ignition` will be documented in this file
 
 ## 1.11.0 - 2023-09-19
 
-- Design tweaks   
-     
-  - Fix gradient on stacktrace   
-  - Move share dropdown to the right navbar   
-  - Always open links in new tabs   
+- Design tweaks
   
-- Add Flare footer   
+  - Fix gradient on stacktrace
+  - Move share dropdown to the right navbar
+  - Always open links in new tabs
+  
+- Add Flare footer
   
 
 **Full Changelog**: https://github.com/spatie/ignition/compare/1.10.1...1.11.0
@@ -51,16 +102,16 @@ All notable changes to `ignition` will be documented in this file
 ## 1.10.0 - 2023-08-21
 
 - Add 'copy to clipboard' support for filepaths and editor URLs
-- Bump Ignition UI from 4.6.0 to 4.9.0, includes following changes:   
-  - Feature: Add 'copy to clipboard' option to editors   
-  - Fix: Improve detection of vendor frames for JS frames   
-  - Fix: Navigation for custom contexts not working when context name has whitespaces.   
-  - Use container queries for responsive components   
-  - Tweak SQL parameter bindings in the query debug tab   
-  - Fix: don't listen to keypress events when typing in input fields or textareas   
-  - Only show context section when relevant   
-  - Add browser section displaying the user agent   
-  - Fix request tab not showing up for JS errors   
+- Bump Ignition UI from 4.6.0 to 4.9.0, includes following changes:
+  - Feature: Add 'copy to clipboard' option to editors
+  - Fix: Improve detection of vendor frames for JS frames
+  - Fix: Navigation for custom contexts not working when context name has whitespaces.
+  - Use container queries for responsive components
+  - Tweak SQL parameter bindings in the query debug tab
+  - Fix: don't listen to keypress events when typing in input fields or textareas
+  - Only show context section when relevant
+  - Add browser section displaying the user agent
+  - Fix request tab not showing up for JS errors
   
 
 ## 1.9.0 - 2023-06-28
@@ -83,17 +134,17 @@ All notable changes to `ignition` will be documented in this file
 
 ### What's Changed
 
-- Bump Ignition-UI to 4.4.0 which includes following changes:   
-     
-  - Add support for custom context   
-  - Add support for exception context   
-  - Show SQL bindings inline in debug section   
+- Bump Ignition-UI to 4.4.0 which includes following changes:
   
-- Add support for custom context, exception context (and query bindings) by @rubenvanassche in https://github.com/spatie/ignition/pull/286   
+  - Add support for custom context
+  - Add support for exception context
+  - Show SQL bindings inline in debug section
   
-- Add PHPStorm via IDE Remote Control editor link by @raveren in https://github.com/spatie/ignition/pull/262   
+- Add support for custom context, exception context (and query bindings) by @rubenvanassche in https://github.com/spatie/ignition/pull/286
   
-- Fix editor link for Panic's Nova by @knorthfield in https://github.com/spatie/ignition/pull/284   
+- Add PHPStorm via IDE Remote Control editor link by @raveren in https://github.com/spatie/ignition/pull/262
+  
+- Fix editor link for Panic's Nova by @knorthfield in https://github.com/spatie/ignition/pull/284
   
 
 ### New Contributors
@@ -114,28 +165,28 @@ All notable changes to `ignition` will be documented in this file
 
 ### What's Changed
 
-- Bump spatie/ignition-ui to 4.2.0. Includes following changes:   
+- Bump spatie/ignition-ui to 4.2.0. Includes following changes:
   
-- - Add indicator for AI-generated solutions   
-  
-- 
-- 
-- 
-- 
-- - Add support for rendering markdown in solutions   
+- - Add indicator for AI-generated solutions
   
 - 
 - 
 - 
 - 
-- - Fix vendor frame grouping on Windows   
+- - Add support for rendering markdown in solutions
+  
+- 
+- 
+- 
+- 
+- - Fix vendor frame grouping on Windows
   
 - 
 - 
 - 
 - 
 - 
-- Bump dependabot/fetch-metadata from 1.3.6 to 1.4.0 by @dependabot in https://github.com/spatie/ignition/pull/267   
+- Bump dependabot/fetch-metadata from 1.3.6 to 1.4.0 by @dependabot in https://github.com/spatie/ignition/pull/267
   
 
 **Full Changelog**: https://github.com/spatie/ignition/compare/1.5.0...1.6.0
@@ -207,9 +258,9 @@ All notable changes to `ignition` will be documented in this file
 
 ## 1.3.1 - 2022-05-16
 
-- Bump Ignition UI to v4.0.2   
+- Bump Ignition UI to v4.0.2
   
-- - Fix types: `context.env` can be `null` or `undefined`   
+- - Fix types: `context.env` can be `null` or `undefined`
   
 - 
 - 
@@ -224,7 +275,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- JS bundle is no longer compressed to make debugging easier   
+- JS bundle is no longer compressed to make debugging easier
   
 
 **Full Changelog**: https://github.com/spatie/ignition/compare/1.3.0...1.3.1
@@ -233,129 +284,9 @@ All notable changes to `ignition` will be documented in this file
 
 ## What's Changed
 
-- Use Ignition UI v4 by @AlexVanderbist in https://github.com/spatie/ignition/pull/129   
+- Use Ignition UI v4 by @AlexVanderbist in https://github.com/spatie/ignition/pull/129
   
-- - Bump Ignition UI version to 4.0.1   
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- - - Fixed a missing key in Query debug section      
-       
-  
-- -    
-  
-- 
-- -    
-  
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
+- - Bump Ignition UI version to 4.0.1
   
 - 
 - 
@@ -370,43 +301,35 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- - - Fixed selecting exceptions without accidentally collapsing the error card      
-       
+- - - Fixed a missing key in Query debug section
+    
   
-- -    
-  
-- 
-- -    
+- - 
   
 - 
-- 
-- -    
+- - 
   
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -414,8 +337,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -424,8 +346,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -435,8 +356,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -447,8 +367,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -460,8 +379,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -474,8 +392,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -489,113 +406,7 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- 
-- - - Triple clicking a code snippet now always selects it      
-       
-  
-- -    
-  
-- 
-- -    
-  
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
-  
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- -    
+- - 
   
 - 
 - 
@@ -610,7 +421,112 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- -    
+- - - Fixed selecting exceptions without accidentally collapsing the error card
+    
+  
+- - 
+  
+- 
+- - 
+  
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
   
 - 
 - 
@@ -625,7 +541,112 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- - Refactor error occurrence context items types   
+- - - Triple clicking a code snippet now always selects it
+    
+  
+- - 
+  
+- 
+- - 
+  
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - 
   
 - 
 - 
@@ -640,7 +661,37 @@ All notable changes to `ignition` will be documented in this file
 - 
 - 
 - 
-- - Log error to console when sharing to Flare goes wrong   
+- - 
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - Refactor error occurrence context items types
+  
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- - Log error to console when sharing to Flare goes wrong
   
 - 
 - 

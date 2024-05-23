@@ -15,6 +15,8 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__ . '/tests/end-to-end')
     ->in(__DIR__ . '/tests/unit')
     ->notName('DeprecatedPhpFeatureTest.php')
+    // don't mangle whitespaces in this test, which are required for the error reproduce
+    ->notName('Issue5795Test.php')
     ->notName('ReadonlyClass.php')
     ->notName('*.phpt');
 
@@ -345,6 +347,6 @@ $config->setFinder($finder)
         'whitespace_after_comma_in_array' => true,
     ]);
 
-$config->setCacheFile(__DIR__ . '/.php-cs-fixer.cache/' . sha1(@trim((string) @shell_exec('git rev-parse --abbrev-ref HEAD'))));
+$config->setCacheFile(__DIR__ . '/.php-cs-fixer.cache/' . json_decode((string) @file_get_contents('composer.json'), true)["extra"]["branch-alias"]["dev-main"] ?? 'unknown');
 
 return $config;

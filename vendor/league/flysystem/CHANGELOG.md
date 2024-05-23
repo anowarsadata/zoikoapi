@@ -1,5 +1,30 @@
 # Changelog
 
+## 3.27.0 - 2024-04-07
+
+### Fixed
+
+- Corrected AWS SSE-C Options
+- Handle MetadataDirective gracefully.
+
+## 3.26.0 - 2024-03-25
+
+### Fixed
+
+- Make SFTP connectivity pinging an opt-in feature.
+
+### Added 
+
+- Add `add_content_md5` option to AWS S3 (#1774)
+- Added AWS SSE-C options (#1773)
+
+## 3.25.1 - 2024-03-16
+
+### Fixed
+
+- Cleanup connection instance after disconnecting SFTP connection.
+- Fix upcoming PHP 8.4 deprecations (#1772) 
+
 ## 3.25.0 - 2024-03-09
 
 ### Added

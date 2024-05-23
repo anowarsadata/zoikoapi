@@ -32,6 +32,8 @@ use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use Mockery as m;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
@@ -165,12 +167,51 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $v->validate());
     }
 
+    public function testValidatedThrowsOnFail()
+    {
+        $this->expectException(ValidationException::class);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['baz' => 'required']);
+
+        $v->validated();
+    }
+
+    public function testValidatedThrowsOnFailEvenAfterPassesCall()
+    {
+        $this->expectException(ValidationException::class);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['baz' => 'required']);
+
+        $v->passes();
+        $v->validated();
+    }
+
+    public function testValidatedDoesntThrowOnPass(): void
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'required']);
+        $this->assertSame(['foo' => 'bar'], $v->validated());
+
+        $v = new Validator($trans, [], []);
+        $this->assertSame([], $v->validated());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'qux'], ['foo' => 'required', 'baz' => 'required']);
+        $this->assertSame(['foo' => 'bar', 'baz' => 'qux'], $v->validated());
+    }
+
     public function testHasFailedValidationRules()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
         $this->assertFalse($v->passes());
         $this->assertEquals(['foo' => ['Same' => ['baz']]], $v->failed());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'bar'], ['foo' => 'Same:baz', 'baz' => 'Required']);
+        $this->assertTrue($v->passes());
+        $this->assertEmpty($v->failed());
     }
 
     public function testFailingOnce()
@@ -243,6 +284,15 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => ''], ['x' => 'size:10|array|integer|min:5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'array']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'integer']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'min:5']);
         $this->assertTrue($v->passes());
     }
 
@@ -961,6 +1011,23 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => new File('/tmp/foo', false)], ['foo' => 'Array']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateList()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'list']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => new File('/tmp/foo', false)], ['foo' => 'list']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1 => 1, 2 => 2]], ['foo' => 'list']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['bar' => 'baz']], ['foo' => 'list']);
         $this->assertFalse($v->passes());
     }
 
@@ -1814,7 +1881,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->messages()->has('foo.1.email'));
     }
 
-    /** @dataProvider prohibitedRulesData */
+    #[DataProvider('prohibitedRulesData')]
     public function testProhibitedRulesAreConsistent($rules, $data, $result)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -2397,6 +2464,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertSame('The foo field must be accepted when bar is true.', $v->messages()->first('foo'));
+    }
+
+    public function testValidateRequiredIfDeclined()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'baz'], ['bar' => 'required_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'baz'], ['bar' => 'required_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_if_declined:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => ''], ['bar' => 'required_if_declined:foo']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateDeclined()
@@ -3432,9 +3515,8 @@ class ValidationValidatorTest extends TestCase
      * @param  mixed  $input
      * @param  mixed  $allowed
      * @param  bool  $passes
-     *
-     * @dataProvider multipleOfDataProvider
      */
+    #[DataProvider('multipleOfDataProvider')]
     public function testValidateMultipleOf($input, $allowed, $passes)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4330,9 +4412,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    /**
-     * @dataProvider validUrls
-     */
+    #[DataProvider('validUrls')]
     public function testValidateUrlWithValidUrls($validUrl)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4340,9 +4420,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    /**
-     * @dataProvider invalidUrls
-     */
+    #[DataProvider('invalidUrls')]
     public function testValidateUrlWithInvalidUrls($invalidUrl)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4614,9 +4692,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider activeUrlDataProvider
-     */
+    #[DataProvider('activeUrlDataProvider')]
     public function testValidateActiveUrl($data, $outcome)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -4846,6 +4922,13 @@ class ValidationValidatorTest extends TestCase
         // Ensure validation doesn't erroneously fail when ratio doesn't matches
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertFalse($v->passes());
+
+        // Knowing that demo image5.png has width = 1366 and height = 768
+        $uploadedFile = new UploadedFile(__DIR__.'/fixtures/image5.png', '', null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=16/9']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateMimetypes()
@@ -4954,9 +5037,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    /**
-     * @requires extension fileinfo
-     */
+    #[RequiresPhpExtension('fileinfo')]
     public function testValidateFile()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -8205,9 +8286,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    /**
-     * @dataProvider validUuidList
-     */
+    #[DataProvider('validUuidList')]
     public function testValidateWithValidUuid($uuid)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -8215,9 +8294,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    /**
-     * @dataProvider invalidUuidList
-     */
+    #[DataProvider('invalidUuidList')]
     public function testValidateWithInvalidUuid($uuid)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -8495,9 +8572,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providesPassingExcludeIfData
-     */
+    #[DataProvider('providesPassingExcludeIfData')]
     public function testExcludeIf($rules, $data, $expectedValidatedData)
     {
         $validator = new Validator(
@@ -8610,9 +8685,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providesFailingExcludeIfData
-     */
+    #[DataProvider('providesFailingExcludeIfData')]
     public function testExcludeIfWhenValidationFails($rules, $data, $expectedMessages)
     {
         $validator = new Validator(
@@ -8652,9 +8725,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providesPassingExcludeData
-     */
+    #[DataProvider('providesPassingExcludeData')]
     public function testExclude($rules, $data, $expectedValidatedData)
     {
         $validator = new Validator(
@@ -9228,7 +9299,7 @@ class ValidationValidatorTest extends TestCase
         ], $validator->messages()->keys());
     }
 
-    /** @dataProvider outsideRangeExponents */
+    #[DataProvider('outsideRangeExponents')]
     public function testItLimitsLengthOfScientificNotationExponent($value)
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -9252,7 +9323,7 @@ class ValidationValidatorTest extends TestCase
         ];
     }
 
-    /** @dataProvider withinRangeExponents */
+    #[DataProvider('withinRangeExponents')]
     public function testItAllowsScientificNotationWithinRange($value, $rule)
     {
         $trans = $this->getIlluminateArrayTranslator();

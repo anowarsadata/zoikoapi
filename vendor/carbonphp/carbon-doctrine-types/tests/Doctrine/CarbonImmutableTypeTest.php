@@ -10,7 +10,7 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Platforms\DB2Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\TestCase;
 
@@ -57,7 +57,7 @@ class CarbonImmutableTypeTest extends TestCase
 
         self::assertSame('DATETIME(3)', $type->getSQLDeclaration([
             'precision' => 99,
-        ], new SqlitePlatform()));
+        ], new SQLitePlatform()));
 
         self::assertSame('DATETIME(6)', $type->getSQLDeclaration([
             'precision' => 99,

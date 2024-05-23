@@ -42,6 +42,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UnexpectedValueException;
 
+include_once __DIR__.'/Enums.php';
+
 class RoutingRouteTest extends TestCase
 {
     public function testBasicDispatchingOfRoutes()
@@ -1874,7 +1876,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar = null) {
+            'uses' => function (?RoutingTestUserModel $bar = null) {
                 $this->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
                 return $bar->value;
@@ -1883,12 +1885,27 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testOptionalBackedEnumsReturnNullWhenMissing()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/{bar?}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (?CategoryBackedEnum $bar = null) {
+                $this->assertNull($bar);
+
+                return 'bar';
+            },
+        ]);
+
+        $router->dispatch(Request::create('foo', 'GET'))->getContent();
+    }
+
     public function testImplicitBindingsWithMissingModelHandledByMissing()
     {
         $router = $this->getRouter();
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RouteModelBindingNullStub $bar = null) {
+            'uses' => function (?RouteModelBindingNullStub $bar = null) {
                 $this->assertInstanceOf(RouteModelBindingNullStub::class, $bar);
 
                 return $bar->first();
@@ -1912,7 +1929,7 @@ class RoutingRouteTest extends TestCase
             ->group(function () use ($router) {
                 $router->get('foo/{bar}', [
                     'middleware' => SubstituteBindings::class,
-                    'uses' => function (RouteModelBindingNullStub $bar = null) {
+                    'uses' => function (?RouteModelBindingNullStub $bar = null) {
                         $this->assertInstanceOf(RouteModelBindingNullStub::class, $bar);
 
                         return $bar->first();
@@ -1932,7 +1949,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar = null) {
+            'uses' => function (?RoutingTestUserModel $bar = null) {
                 $this->assertNull($bar);
             },
         ]);
@@ -1960,7 +1977,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestNonExistingUserModel $bar = null) {
+            'uses' => function (?RoutingTestNonExistingUserModel $bar = null) {
                 $this->fail('ModelNotFoundException was expected.');
             },
         ]);
@@ -2338,7 +2355,7 @@ class RouteTestAnotherControllerWithParameterStub extends Controller
         //
     }
 
-    public function withModels(Request $request, RoutingTestUserModel $user, $defaultNull = null, RoutingTestTeamModel $team = null)
+    public function withModels(Request $request, RoutingTestUserModel $user, $defaultNull = null, ?RoutingTestTeamModel $team = null)
     {
         //
     }

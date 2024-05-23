@@ -73,6 +73,9 @@ class AsyncAwsS3Adapter implements FilesystemAdapter, PublicUrlGenerator, Checks
         'Tagging',
         'WebsiteRedirectLocation',
         'ChecksumAlgorithm',
+        'CopySourceSSECustomerAlgorithm',
+        'CopySourceSSECustomerKey',
+        'CopySourceSSECustomerKeyMD5',
     ];
 
     /**
@@ -106,8 +109,8 @@ class AsyncAwsS3Adapter implements FilesystemAdapter, PublicUrlGenerator, Checks
         private S3Client $client,
         private string $bucket,
         string $prefix = '',
-        VisibilityConverter $visibility = null,
-        MimeTypeDetector $mimeTypeDetector = null,
+        ?VisibilityConverter $visibility = null,
+        ?MimeTypeDetector $mimeTypeDetector = null,
         array $forwardedOptions = self::AVAILABLE_OPTIONS,
         array $metadataFields = self::EXTRA_METADATA_FIELDS,
     ) {
@@ -411,7 +414,7 @@ class AsyncAwsS3Adapter implements FilesystemAdapter, PublicUrlGenerator, Checks
     /**
      * @param HeadObjectOutput|AwsObject|CommonPrefix $item
      */
-    private function mapS3ObjectMetadata($item, string $path = null): StorageAttributes
+    private function mapS3ObjectMetadata($item, ?string $path = null): StorageAttributes
     {
         if (null === $path) {
             if ($item instanceof AwsObject) {
