@@ -16,6 +16,7 @@ class UserAddress extends Model
         'state',
         'country',
         'type',
+        'phone',
     ];
 
 
