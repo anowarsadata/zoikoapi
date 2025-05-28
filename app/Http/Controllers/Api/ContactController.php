@@ -61,17 +61,30 @@ class ContactController extends Controller
 
     public function destroy($id)
     {
-        $check_authentication = Auth::user();
-        if ($check_authentication && $check_authentication->hasRole('admin')) {
-            Contact::destroy($id);
-            // echo "deleted";
+        $authUser = Auth::user();
+
+        if (!$authUser || !$authUser->hasRole('admin')) {
             return response()->json([
-                'message' => 'Record Deleted.',
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => $check_authentication,
-            ], 200);
+                'success' => false,
+                'message' => 'Access denied.'
+            ], 403);
         }
+
+        $contact = Contact::find($id);
+
+        if (!$contact) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Record not found.'
+            ], 404);
+        }
+
+        $contact->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Record deleted.'
+        ], 200);
     }
+
 }
