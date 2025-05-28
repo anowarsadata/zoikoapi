@@ -30,6 +30,15 @@ class PageController extends Controller
                 'content' => 'required',
             ]);
 
+                // Check for duplicate title
+            $existingPage = Page::where('title', $request->title)->first();
+
+            if ($existingPage) {
+                return response()->json([
+                    'message' => 'Duplicate title already exists.'
+                ], 409); // 409 Conflict
+            }
+
             // Create a new page instance with the validated data
             $page = new Page([
                 'title' => $validatedData['title'],
