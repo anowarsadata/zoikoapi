@@ -83,7 +83,7 @@ class ContactController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Record deleted.'
+            'message' => 'Contact record deleted .'
         ], 200);
     }
 
