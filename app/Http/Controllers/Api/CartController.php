@@ -7,110 +7,139 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of all carts (admin-only in future).
      */
     public function index()
     {
-        //
+        $carts = Cart::all();
+        return response()->json([
+            'success' => true,
+            'data' => $carts,
+        ], Response::HTTP_OK);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource (not used in API).
      */
     public function create()
     {
-        //
+        return response()->json([
+            'message' => 'This endpoint is not applicable for API.',
+        ], Response::HTTP_NOT_IMPLEMENTED);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new cart for the user (if it doesn't already exist).
      */
     public function store(Request $request)
     {
-        //$check_authentication = Auth::user();
-        //if ($check_authentication) {
-        $validatedData = $this->validate($request, [
-            'user_id' => 'required|int'
+        $validatedData = $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
         ]);
-        if ($validatedData) {
-            $result = Cart::create($request->all());
-            return response()->json([
-                'success' => true,
-                'message' => "Record created successfully.",
-                'cart' => $result,
-            ], 200);
-        }
-        /*} else {
-            return response()->json([
-                'message' => $check_authentication,
-            ], 200);
-        }*/
-    }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //$check_authentication = Auth::user();
-        //if ($check_authentication) {
-        $cart = Cart::query()
-            ->where("user_id", $id)
-            ->get();
+        // Prevent duplicate cart creation
+        $existingCart = Cart::where('user_id', $validatedData['user_id'])->first();
+
+        if ($existingCart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart already exists for this user.',
+                'cart' => $existingCart,
+            ], Response::HTTP_CONFLICT);
+        }
+
+        $cart = Cart::create([
+            'user_id' => $validatedData['user_id'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return response()->json([
-            'Cart' => $cart,
-        ]);
-        /*} else {
-            return response()->json([
-                'message' => $check_authentication,
-            ], 200);
-        }*/
+            'success' => true,
+            'message' => 'Cart created successfully.',
+            'cart' => $cart,
+        ], Response::HTTP_CREATED);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Get cart by user ID.
+     */
+    public function show(string $user_id)
+    {
+        $cart = Cart::where('user_id', $user_id)->first();
+
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found for this user.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json([
+            'success' => true,
+            'cart' => $cart,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Show the form for editing the specified resource (not used in API).
      */
     public function edit(string $id)
     {
-        //
+        return response()->json([
+            'message' => 'This endpoint is not applicable for API.',
+        ], Response::HTTP_NOT_IMPLEMENTED);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update an existing cart (for extension or admin use).
      */
     public function update(Request $request, string $id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //$check_authentication = Auth::user();
-        //if ($check_authentication) {
         $cart = Cart::find($id);
 
         if (!$cart) {
-            return response()->json(['message' => 'Record not found'], Response::HTTP_NOT_FOUND);
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Example: Update cart fields here if needed (e.g. status)
+        $cart->updated_at = now();
+        $cart->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart updated successfully.',
+            'cart' => $cart,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Delete a cart by its ID.
+     */
+    public function destroy(string $id)
+    {
+        $cart = Cart::find($id);
+
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart not found.',
+            ], Response::HTTP_NOT_FOUND);
         }
 
         $cart->delete();
+
         return response()->json([
-            'message' => 'Record deleted',
+            'success' => true,
+            'message' => 'Cart deleted successfully.',
             'cart' => $cart,
         ], Response::HTTP_OK);
-        /* } else {
-             return response()->json([
-                 'message' => $check_authentication,
-             ], 200);
-         }*/
     }
 }

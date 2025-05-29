@@ -210,10 +210,10 @@ class OrderController extends Controller
         if ($check_authentication && $check_authentication->hasRole('admin')) {
             $product = Order::find($id);
             if (!$product) {
-                return response()->json(['message' => 'Product not found'], Response::HTTP_NOT_FOUND);
+                return response()->json(['message' => 'Order not found'], Response::HTTP_NOT_FOUND);
             }
             $product->delete();
-            return response()->json(['message' => 'Product deleted'], Response::HTTP_OK);
+            return response()->json(['message' => 'Order deleted'], Response::HTTP_OK);
         } else {
             return response()->json([
                 'message' => $check_authentication,

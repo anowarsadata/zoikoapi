@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CartItem;
-use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -15,7 +14,12 @@ class CartItemController extends Controller
      */
     public function index()
     {
-        //
+        $items = CartItem::all();
+
+        return response()->json([
+            'success' => true,
+            'items' => $items,
+        ], 200);
     }
 
     /**
@@ -23,7 +27,8 @@ class CartItemController extends Controller
      */
     public function create()
     {
-        //
+        // Not used in API context
+        return response()->json(['message' => 'Not supported.'], 405);
     }
 
     /**
@@ -31,32 +36,32 @@ class CartItemController extends Controller
      */
     public function store(Request $request)
     {
-        //$check_authentication = Auth::user();
-        //if ($check_authentication) {
-        $validatedData = $this->validate($request, [
-            'cart_id' => 'required|int',
-            'product_id' => 'required|int',
+        $validated = $request->validate([
+            'cart_id' => 'required|exists:carts,id',
+            'product_id' => 'required|exists:products,id',
         ]);
-        if ($validatedData) {
-            $existing_check = CartItem::where('cart_id', $request->cart_id)->where('product_id', $request->product_id)->exists();
-            if (!$existing_check) {
-                $result = CartItem::create($request->all());
-                return response()->json([
-                    'success' => true,
-                    'message' => "Record created successfully.",
-                    'cart item' => $result,
-                ], 200);
-            } else {
-                return response()->json([
-                    'message' => 'Record already exist',
-                ], 200);
-            }
-        }
-        /*} else {
+
+        $exists = CartItem::where('cart_id', $request->cart_id)
+            ->where('product_id', $request->product_id)
+            ->exists();
+
+        if ($exists) {
             return response()->json([
-                'message' => $check_authentication,
+                'success' => false,
+                'message' => 'Cart item already exists.',
             ], 200);
-        }*/
+        }
+
+        $cartItem = CartItem::create([
+            'cart_id' => $request->cart_id,
+            'product_id' => $request->product_id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart item created successfully.',
+            'cart_item' => $cartItem,
+        ], 201);
     }
 
     /**
@@ -64,7 +69,19 @@ class CartItemController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $cartItem = CartItem::find($id);
+
+        if (!$cartItem) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart item not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'cart_item' => $cartItem,
+        ], 200);
     }
 
     /**
@@ -72,40 +89,36 @@ class CartItemController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        // Not used in API context
+        return response()->json(['message' => 'Not supported.'], 405);
     }
 
     /**
-     * Update the specified resource in storage usig cart item id.
+     * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //$check_authentication = Auth::user();
-        //if ($check_authentication && $check_authentication->hasRole('admin')) {
-        $validatedData = $this->validate($request, [
-            'quantity' => 'required|integer',
-        ]);
-        $cart_item = CartItem::find($id);
-        if ($validatedData) {
-            if ($cart_item->update($request->all())) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Record updated successfully.',
-                    'cart_item' => $cart_item,
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No record updated.',
-                    'city' => $cart_item,
-                ]);
-            }
-        }
-        /*} else {
+        $cartItem = CartItem::find($id);
+
+        if (!$cartItem) {
             return response()->json([
-                'message' => $check_authentication,
-            ], 200);
-        }*/
+                'success' => false,
+                'message' => 'Cart item not found.',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $cartItem->quantity = $request->quantity;
+        $cartItem->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart item updated successfully.',
+            'cart_item' => $cartItem,
+        ], 200);
     }
 
     /**
@@ -113,20 +126,20 @@ class CartItemController extends Controller
      */
     public function destroy(string $id)
     {
-        //$check_authentication = Auth::user();
-        //if ($check_authentication) {
-        $cart_item = CartItem::find($id);
+        $cartItem = CartItem::find($id);
 
-        if (!$cart_item) {
-            return response()->json(['message' => 'Record not found'], Response::HTTP_NOT_FOUND);
+        if (!$cartItem) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart item not found.',
+            ], 404);
         }
 
-        $cart_item->delete();
-        return response()->json(['message' => 'Record deleted'], Response::HTTP_OK);
-        /* } else {
-             return response()->json([
-                 'message' => $check_authentication,
-             ], 200);
-         }*/
+        $cartItem->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart item deleted successfully.',
+        ], 200);
     }
 }
