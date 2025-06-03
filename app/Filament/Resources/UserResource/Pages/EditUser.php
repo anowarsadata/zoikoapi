@@ -8,8 +8,7 @@ use Filament\Resources\Pages\EditRecord;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class EditUser extends EditRecord
 {
@@ -21,22 +20,47 @@ class EditUser extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
     public function form(Form $form): Form
     {
-        $roles = DB::table('roles')->pluck('name', 'id');
-        $status = array('0' => 'In-active', '1' => 'Active');
+        $statusOptions = [
+            0 => 'In-active',
+            1 => 'Active',
+        ];
+
         return $form
             ->schema([
                 TextInput::make('name')->required(),
-                TextInput::make('email')->required(),
-                Select::make('role_id')
-                    ->required()
+                TextInput::make('email')->required()->email(),
+                Select::make('roles')
                     ->label('User Role')
-                    ->options($roles),
-                Select::make('status')
+                    ->relationship('roles', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required()
+                    ->native(false),
+                Select::make('status')
                     ->label('Status')
-                    ->options($status)
+                    ->options($statusOptions)
+                    ->required()
+                    ->native(false),
             ]);
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        unset($data['roles']); // Roles handled separately
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        $roleId = $this->form->getState()['roles'];
+        $roleName = \Spatie\Permission\Models\Role::find($roleId)?->name;
+
+        if ($roleName) {
+            $this->record->syncRoles($roleName);
+        }
+    }
+
 }

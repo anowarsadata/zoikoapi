@@ -4,6 +4,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Branding
+    |--------------------------------------------------------------------------
+    |
+    | You can customize the brand name or logo shown in the admin panel.
+    |
+    */
+
+    'brand' => env('APP_NAME', 'Filament'),
+    // Optionally: Use a Blade view or HTML for a logo
+    // 'brand' => fn () => view('components.admin-logo')->render(),
+
+    // Optional logo image (only works with dark/light mode logos published)
+    // 'brand_logo' => asset('images/logo.svg'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Broadcasting
     |--------------------------------------------------------------------------
     |
@@ -27,7 +43,6 @@ return [
         //     'disableStats' => true,
         //     'encrypted' => true,
         // ],
-
     ],
 
     /*

@@ -12,4 +12,10 @@ class ProductAttribute extends Model
     public function products() {
         return $this->belongsTo(Product::class);
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
 }

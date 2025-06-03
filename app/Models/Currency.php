@@ -13,4 +13,10 @@ class Currency extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
 }

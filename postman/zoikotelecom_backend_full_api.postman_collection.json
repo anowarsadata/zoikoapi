@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}",
+							"raw": "{\n    \"email\": \"anowar.euronox@gmail.com\",\n    \"password\": \"admin123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -68,15 +68,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/register",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/v1/register",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -182,15 +177,10 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/user/delete/19",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/v1/user/delete/19",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -222,15 +212,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/password/email",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/v1/password/email",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -261,15 +246,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/password/code/check",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/v1/password/code/check",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -305,15 +285,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/password/reset",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/v1/password/reset",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -1275,11 +1250,16 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"type\": \"Updated Flat\"\n}",
+							"raw": "{\n  \"type\": \"Updated Flat\",\n  \"name\":\"5% Discount\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1287,15 +1267,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/discount/type/update/1",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/v1/discount/type/update/1",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -1387,7 +1362,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"user_id\": 1\n}",
+							"raw": "{\n  \"user_id\": 3\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1456,7 +1431,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"cart_id\": 2,\n  \"product_id\": 1\n}",
+							"raw": "{\n  \"cart_id\": 7,\n  \"product_id\": 4\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1630,7 +1605,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/order/1",
+							"raw": "{{base_url}}/api/v1/order/8",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1638,7 +1613,7 @@
 								"api",
 								"v1",
 								"order",
-								"1"
+								"8"
 							]
 						}
 					},
@@ -1760,21 +1735,16 @@
 							}
 						],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/v1/order/delete/1",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/v1/order/delete/3",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
 								"order",
 								"delete",
-								"1"
+								"3"
 							]
 						}
 					},

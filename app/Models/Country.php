@@ -14,4 +14,10 @@ class Country extends Model
     {
         return $this->hasMany(State::class);
     }
+
+    public function currencies()
+    {
+        return $this->hasMany(Currency::class);
+    }
+
 }
