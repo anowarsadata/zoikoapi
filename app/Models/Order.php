@@ -34,4 +34,31 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    public function billingAddress()
+    {
+        return $this->belongsTo(UserAddress::class, 'billing_address_id');
+    }
+
+    public function shippingAddress()
+    {
+        return $this->belongsTo(UserAddress::class, 'shipping_address_id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(\App\Models\OrderItem::class);
+    }
+
+
 }

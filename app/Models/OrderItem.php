@@ -13,4 +13,10 @@ class OrderItem extends Model
     {
         return $this->belongsToMany(Order::class);
     }
+
+    public function product()
+    {
+        return $this->belongsTo(\App\Models\Product::class);
+    }
+
 }
